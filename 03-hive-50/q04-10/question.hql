@@ -16,7 +16,7 @@ CREATE TABLE tbl0 (
     c5 ARRAY<CHAR(1)>, 
     c6 MAP<STRING, INT>
 )
-ROW FORMAT DELIMITED 
+ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 COLLECTION ITEMS TERMINATED BY ':'
 MAP KEYS TERMINATED BY '#'
@@ -40,3 +40,21 @@ LOAD DATA LOCAL INPATH 'tbl1.csv' INTO TABLE tbl1;
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+DROP TABLE IF EXISTS tabla1;
+
+DROP TABLE IF EXISTS result;
+
+CREATE TABLE tabla1
+AS
+    SELECT explode(c5) FROM tbl0 AS col;
+    
+CREATE TABLE result
+AS
+    SELECT DISTINCT col FROM tabla1
+ORDER BY
+    col;
+
+INSERT OVERWRITE DIRECTORY '/tmp/output'
+SELECT * FROM result;
+
+!hdfs dfs -copyToLocal /tmp/output output

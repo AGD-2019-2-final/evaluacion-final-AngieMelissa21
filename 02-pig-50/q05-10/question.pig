@@ -12,3 +12,14 @@ fs -rm -f -r output;
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+dt = LOAD 'data.tsv'
+    AS (f1:chararray, 
+        f2:BAG{t: (p:chararray)},  
+        f3:MAP[]);
+
+
+r = FOREACH dt GENERATE FLATTEN($1) AS letra;
+g = GROUP r BY letra;
+z = FOREACH g GENERATE group,COUNT(r);
+
+STORE z INTO 'output';
